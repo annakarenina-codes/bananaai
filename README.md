@@ -1,7 +1,7 @@
 # BananaAI - AI-Powered Demand Forecasting System
 
 ## Frontend Deployment URL:
-** [Frontend Demo]** ([https://yourfrontendurl.com](https://bananaaifrontend-git-main-anna-karenina-sanglays-projects.vercel.app)) 
+https://bananaaifrontend-git-main-anna-karenina-sanglays-projects.vercel.app
 
 ## Backend Progress:
 - **Status**: The backend is under development. Current API routes are functional, but the database connection and optimization are in progress.
