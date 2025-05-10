@@ -31,7 +31,8 @@ class NotificationListResource(Resource):
             notification_type=data.get('notification_type'),
             message=data.get('message'),
             status=data.get('status', 'unread'),
-            recipient_user_id=data.get('recipient_user_id')
+            recipient_user_id=data.get('recipient_user_id'),
+            notification_date=datetime.utcnow()  # Set notification date to now
         )
         
         db.session.add(new_notification)
@@ -94,7 +95,8 @@ class SystemNotificationResource(Resource):
                     notification_type='low_stock',
                     message=f"Low stock alert: {product.name} has only {product.available_stock} units left",
                     status='unread',
-                    recipient_user_id='admin'  # Default recipient
+                    recipient_user_id='admin',  # Default recipient (you may want to query the actual admin user)
+                    notification_date=datetime.utcnow()  # Set notification date
                 )
                 db.session.add(notification)
                 notifications_created += 1
@@ -124,7 +126,8 @@ class SystemNotificationResource(Resource):
                     notification_type='expiry_reminder',
                     message=f"Expiry alert: {product.name} will expire in {days_to_expiry} days",
                     status='unread',
-                    recipient_user_id='admin'  # Default recipient
+                    recipient_user_id='admin',  # Default recipient (you may want to query the actual admin user)
+                    notification_date=datetime.utcnow()  # Set notification date
                 )
                 db.session.add(notification)
                 notifications_created += 1

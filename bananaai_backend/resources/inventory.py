@@ -71,6 +71,41 @@ class InventoryMovementResource(Resource):
             'quantity': movement.quantity
         }
     
+    def put(self, movement_id):
+        movement = InventoryMovement.query.get_or_404(movement_id)
+        data = request.get_json()
+
+        # Update movement fields
+        movement.movement_type = data.get('movement_type', movement.movement_type)
+        movement.quantity = data.get('quantity', movement.quantity)
+
+        # Update the associated product's stock accordingly
+        product = Product.query.get_or_404(movement.product_id)
+        
+        if movement.movement_type == 'restock':
+            difference = data.get('quantity', movement.quantity) - movement.quantity
+            product.total_stock += difference
+            product.stock_restocked += difference
+            product.available_stock += difference
+        
+        elif movement.movement_type == 'sell':
+            difference = movement.quantity - data.get('quantity', movement.quantity)
+            if product.available_stock < difference:
+                return {'message': 'Not enough available stock'}, 400
+            product.stock_sold -= difference
+            product.available_stock += difference
+        
+        elif movement.movement_type == 'damage':
+            difference = movement.quantity - data.get('quantity', movement.quantity)
+            if product.available_stock < difference:
+                return {'message': 'Not enough available stock'}, 400
+            product.available_stock += difference
+        
+        db.session.commit()
+        
+        return {'message': 'Inventory movement updated successfully'}
+
+
     def delete(self, movement_id):
         movement = InventoryMovement.query.get_or_404(movement_id)
         

@@ -121,4 +121,43 @@ class SaleResource(Resource):
             'payment_method': invoice.payment_method,
             'due_date': invoice.due_date.isoformat() if invoice.due_date else None,
             'items': items
-        }
+         }
+    def put(self, sale_id):
+        invoice = Invoice.query.get_or_404(sale_id)
+        data = request.get_json()
+
+    # Update invoice fields
+        invoice.customer_id = data.get('customer_id', invoice.customer_id)
+        invoice.customer_name = data.get('customer_name', invoice.customer_name)
+        invoice.status = data.get('status', invoice.status)
+        invoice.payment_method = data.get('payment_method', invoice.payment_method)
+
+    # If due_date exists, attempt to update it
+        if data.get('due_date'):
+            try:
+                invoice.due_date = datetime.fromisoformat(data['due_date'])
+            except ValueError:
+                return {'message': 'Invalid date format'}, 400
+
+    # Process each item in the invoice
+        for item_data in data.get('items', []):
+            product_id = item_data['product_id']
+            quantity = item_data['quantity']
+
+        # Get the product
+            product = Product.query.get_or_404(product_id)
+
+        # Update the corresponding InventoryMovement
+            inventory_movement = InventoryMovement.query.filter_by(
+                product_id=product_id,
+                movement_type='sell'
+            ).first()  # Adjust as per your logic, maybe you want the first matching movement.
+
+            if inventory_movement:
+            # Example of updating an existing movement (you can modify it based on your logic)
+                inventory_movement.quantity = quantity
+                db.session.commit()
+
+        db.session.commit()
+
+        return {'message': 'Sale updated successfully'}

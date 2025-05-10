@@ -25,11 +25,27 @@ def create_app(config_class=Config):
     from .resources.forecast import ForecastResource, ForecastListResource, ProductForecastResource
     from .resources.notification import NotificationResource, NotificationListResource, SystemNotificationResource
     
-    # Register API resources
+    # Register Product API resources
     api.add_resource(ProductListResource, '/api/products')
     api.add_resource(ProductResource, '/api/products/<int:product_id>')
     
-    # ... rest of your resource registrations ...
+    # Register Sale API resources
+    api.add_resource(SaleListResource, '/api/sales')
+    api.add_resource(SaleResource, '/api/sales/<int:sale_id>')
+
+    # Register Inventory API resources
+    api.add_resource(InventoryMovementListResource, '/api/inventory-movements')
+    api.add_resource(InventoryMovementResource, '/api/inventory-movements/<int:movement_id>')
+
+    # Register Forecast API resources
+    api.add_resource(ForecastListResource, '/api/forecasts')
+    api.add_resource(ForecastResource, '/api/forecasts/<int:forecast_id>')
+    api.add_resource(ProductForecastResource, '/api/forecasts/product/<int:product_id>')
+
+    # Register Notification API resources
+    api.add_resource(NotificationListResource, '/api/notifications')
+    api.add_resource(NotificationResource, '/api/notifications/<int:notification_id>')
+    api.add_resource(SystemNotificationResource, '/api/notifications/system/<int:system_id>')
     
     # Add debug prints
     print(f"🔍 API Routes registered! Check routes:")
