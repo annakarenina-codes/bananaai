@@ -76,6 +76,20 @@ class ForecastListResource(Resource):
             'message': 'Forecasts generated successfully',
             'forecast_count': len(forecasts)
         }, 201
+    
+    def delete(self):
+        try:
+            # Delete all forecasts
+                deleted_count = Forecast.query.delete()
+                db.session.commit()
+
+                if deleted_count > 0:
+                    return {"message": f"{deleted_count} forecasts deleted successfully"}, 200
+                else:
+                    return {"message": "No forecasts to delete"}, 204
+        except Exception as e:
+                db.session.rollback()  # In case of any error, rollback the transaction
+                return {"message": f"Error deleting forecasts: {str(e)}"}, 500
 
 class ForecastResource(Resource):
     def get(self, forecast_id):
@@ -91,6 +105,39 @@ class ForecastResource(Resource):
             'confidence_interval_lower': forecast.confidence_interval_lower,
             'confidence_interval_upper': forecast.confidence_interval_upper
         }
+    def put(self, forecast_id):
+        forecast = Forecast.query.get_or_404(forecast_id)
+        data = request.get_json()
+
+        # Update only the fields that are provided
+        forecast.predicted_demand = data.get('predicted_demand', forecast.predicted_demand)
+        forecast.forecast_error = data.get('forecast_error', forecast.forecast_error)
+        forecast.confidence_interval_lower = data.get('confidence_interval_lower', forecast.confidence_interval_lower)
+        forecast.confidence_interval_upper = data.get('confidence_interval_upper', forecast.confidence_interval_upper)
+
+        db.session.commit()
+
+        return {
+            'message': 'Forecast updated successfully',
+            'forecast': {
+                'id': forecast.id,
+                'product_id': forecast.product_id,
+                'date': forecast.date.isoformat(),
+                'predicted_demand': forecast.predicted_demand,
+                'historical_demand': forecast.historical_demand,
+                'forecast_error': forecast.forecast_error,
+                'confidence_interval_lower': forecast.confidence_interval_lower,
+                'confidence_interval_upper': forecast.confidence_interval_upper
+            }
+        }, 200
+    
+    def delete(self, forecast_id):
+        forecast = Forecast.query.get_or_404(forecast_id)
+        db.session.delete(forecast)
+        db.session.commit()
+        
+        return {"message": f"Forecast with ID {forecast_id} deleted successfully"}, 200
+
 
 class ProductForecastResource(Resource):
     def get(self, product_id):

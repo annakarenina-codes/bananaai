@@ -45,7 +45,8 @@ def create_app(config_class=Config):
     # Register Notification API resources
     api.add_resource(NotificationListResource, '/api/notifications')
     api.add_resource(NotificationResource, '/api/notifications/<int:notification_id>')
-    api.add_resource(SystemNotificationResource, '/api/notifications/system/<int:system_id>')
+    api.add_resource(SystemNotificationResource, '/api/system-notifications')
+
     
     # Add debug prints
     print(f"🔍 API Routes registered! Check routes:")
